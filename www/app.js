@@ -1,4 +1,5 @@
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { SpeechRecognition } from '@capacitor-community/speech-recognition';
 
 const languages=[
 ["auto","အလိုအလျောက်သိရှိရန်",""],["my","မြန်မာ","my-MM"],["en","English","en-US"],["th","ไทย","th-TH"],["zh-CN","中文简体","zh-CN"],["zh-TW","中文繁體","zh-TW"],["ja","日本語","ja-JP"],["ko","한국어","ko-KR"],["vi","Tiếng Việt","vi-VN"],["km","ខ្មែរ","km-KH"],["lo","ລາວ","lo-LA"],["ms","Melayu","ms-MY"],["id","Indonesia","id-ID"],["tl","Filipino","fil-PH"],["hi","हिन्दी","hi-IN"],["bn","বাংলা","bn-BD"],["ur","اردو","ur-PK"],["ar","العربية","ar-SA"],["fa","فارسی","fa-IR"],["tr","Türkçe","tr-TR"],["fr","Français","fr-FR"],["de","Deutsch","de-DE"],["es","Español","es-ES"],["pt","Português","pt-PT"],["it","Italiano","it-IT"],["ru","Русский","ru-RU"],["uk","Українська","uk-UA"],["nl","Nederlands","nl-NL"],["pl","Polski","pl-PL"],["sv","Svenska","sv-SE"],["no","Norsk","no-NO"],["da","Dansk","da-DK"],["fi","Suomi","fi-FI"],["el","Ελληνικά","el-GR"],["he","עברית","he-IL"],["ne","नेपाली","ne-NP"],["si","සිංහල","si-LK"],["ta","தமிழ்","ta-IN"],["te","తెలుగు","te-IN"],["ml","മലയാളം","ml-IN"],["mr","मराठी","mr-IN"],["gu","ગુજરાતી","gu-IN"],["pa","ਪੰਜਾਬੀ","pa-IN"],["sw","Kiswahili","sw-KE"],["af","Afrikaans","af-ZA"],["am","አማርኛ","am-ET"],["az","Azərbaycanca","az-AZ"],["bg","Български","bg-BG"],["ca","Català","ca-ES"],["hr","Hrvatski","hr-HR"],["cs","Čeština","cs-CZ"],["et","Eesti","et-EE"],["hu","Magyar","hu-HU"],["is","Íslenska","is-IS"],["lt","Lietuvių","lt-LT"],["lv","Latviešu","lv-LV"],["ro","Română","ro-RO"],["sk","Slovenčina","sk-SK"],["sl","Slovenščina","sl-SI"],["sr","Српски","sr-RS"],["sq","Shqip","sq-AL"],["be","Беларуская","be-BY"],["bs","Bosanski","bs-BA"],["mk","Македонски","mk-MK"],["hy","Հայերեն","hy-AM"],["ka","ქართული","ka-GE"],["kk","Қазақша","kk-KZ"],["uz","Oʻzbekcha","uz-UZ"],["mn","Монгол","mn-MN"],["ps","پښتو","ps-AF"],["so","Soomaali","so-SO"],["yo","Yorùbá","yo-NG"],["zu","isiZulu","zu-ZA"],["xh","isiXhosa","xh-ZA"],["ga","Gaeilge","ga-IE"],["cy","Cymraeg","cy-GB"],["eu","Euskara","eu-ES"],["gl","Galego","gl-ES"],["la","Latina","la"],["eo","Esperanto","eo"],["ht","Kreyòl ayisyen","ht-HT"],["yi","ייִדיש","yi"],["mt","Malti","mt-MT"],["lb","Lëtzebuergesch","lb-LU"],["haw","ʻŌlelo Hawaiʻi","haw-US"],["mi","Māori","mi-NZ"],["ny","Chichewa","ny-MW"],["rw","Kinyarwanda","rw-RW"],["mg","Malagasy","mg-MG"],["ceb","Cebuano","ceb-PH"],["jv","Basa Jawa","jv-ID"],["su","Basa Sunda","su-ID"],["ku","Kurdî","ku"],["tk","Türkmençe","tk-TM"],["ky","Кыргызча","ky-KG"],["tg","Тоҷикӣ","tg-TJ"],["tt","Татарча","tt-RU"],["ug","ئۇيغۇرچە","ug-CN"],["br","Brezhoneg","br-FR"],["co","Corsu","co-FR"],["fy","Frysk","fy-NL"],["gd","Gàidhlig","gd-GB"]
@@ -48,4 +49,26 @@ document.querySelector("#speak").onclick=async()=>{
 };
 document.querySelector("#pause").onclick=()=>{if("speechSynthesis"in window&&!window.Capacitor?.isNativePlatform?.()){if(speechSynthesis.speaking){if(speechSynthesis.paused)speechSynthesis.resume();else speechSynthesis.pause()}}else status.textContent="Native အသံဖတ်စနစ်မှာ ခဏရပ်ရန် မရသေးပါ။"};
 document.querySelector("#stop").onclick=async()=>{try{if(window.Capacitor?.isNativePlatform?.())await TextToSpeech.stop();else if("speechSynthesis"in window)speechSynthesis.cancel();status.textContent="အသံရပ်လိုက်ပါပြီ။"}catch(e){status.textContent="အသံရပ်မရပါ။"}};
-document.querySelector("#mic").onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){status.textContent="အသံထည့်သွင်းမှုကို ဒီ Android WebView က မပံ့ပိုးသေးပါ။ Keyboard microphone ကို အသုံးပြုနိုင်ပါတယ်။";return}const rec=new SR();rec.lang=lang(from.value==="auto"?"my":from.value)||"en-US";rec.interimResults=false;rec.onstart=()=>status.textContent="နားထောင်နေပါတယ်...";rec.onerror=()=>status.textContent="Microphone ခွင့်ပြုချက် သို့မဟုတ် ဘာသာစကားကို စစ်ဆေးပါ။";rec.onresult=e=>{source.value=e.results[0][0].transcript;status.textContent="အသံကို စာသားပြောင်းပြီးပါပြီ။"};rec.start()};
+document.querySelector("#mic").onclick=async()=>{
+ const language=lang(from.value==="auto"?"my":from.value)||"my-MM";
+ try{
+  if(window.Capacitor?.isNativePlatform?.()){
+   const permission=await SpeechRecognition.requestPermissions();
+   if(permission.speechRecognition!=="granted"){status.textContent="Microphone ခွင့်ပြုချက် မရသေးပါ။ App permission မှာ Allow လုပ်ပါ။";return}
+   const available=await SpeechRecognition.available();
+   if(!available.available){status.textContent="ဒီဖုန်းမှာ Speech Recognition ဝန်ဆောင်မှု မရှိသေးပါ။ Google app / Speech Services ကို update လုပ်ပါ။";return}
+   status.textContent="နားထောင်နေပါတယ်... ပြောပြီးရင် ခဏစောင့်ပါ။";
+   const result=await SpeechRecognition.start({language,maxResults:1,prompt:"ဘာသာပြန်ရန် ပြောပါ",partialResults:false,popup:true});
+   if(result.matches?.length){source.value=result.matches[0];status.textContent="အသံကို စာသားပြောင်းပြီးပါပြီ။ ဘာသာပြန်ရန် နှိပ်ပါ။"}
+   else status.textContent="အသံမသိရှိနိုင်ပါ။ ထပ်ပြောကြည့်ပါ။";
+  }else{
+   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+   if(!SR){status.textContent="ဒီ browser မှာ အသံထည့်သွင်းမှု မရနိုင်ပါ။";return}
+   const rec=new SR();rec.lang=language;rec.interimResults=false;
+   rec.onstart=()=>status.textContent="နားထောင်နေပါတယ်...";
+   rec.onerror=()=>status.textContent="Microphone ခွင့်ပြုချက် သို့မဟုတ် ဘာသာစကားကို စစ်ဆေးပါ။";
+   rec.onresult=e=>{source.value=e.results[0][0].transcript;status.textContent="အသံကို စာသားပြောင်းပြီးပါပြီ။"};
+   rec.start();
+  }
+ }catch(e){status.textContent="အသံဖမ်းမရပါ။ Microphone ခွင့်ပြုချက်နှင့် Google speech recognition ကို စစ်ပါ။";}
+};
