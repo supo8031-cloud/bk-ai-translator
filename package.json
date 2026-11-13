@@ -1,0 +1,18 @@
+{
+  "name": "bk-ai-translator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BK AI Translator Android app",
+  "scripts": {
+    "build": "echo Static app ready",
+    "android:add": "cap add android",
+    "android:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.1",
+    "@capacitor/android": "^7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.1"
+  }
+}
